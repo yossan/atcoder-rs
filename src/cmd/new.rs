@@ -34,9 +34,16 @@ impl Run for New {
         // Create bin folder
         fs::create_dir("src/bin")?;
 
+        // Create testcase folder
+        fs::create_dir("testcase")?;
+
         // Create template files for AtCoder
         for fname in files {
+			let dname = fname.to_uppercase();
             fs::File::create(format!("src/bin/{fname}.rs")).unwrap();
+            fs::create_dir(format!("testcase/{dname}")).unwrap();
+            fs::create_dir(format!("testcase/{dname}/in")).unwrap();
+            fs::create_dir(format!("testcase/{dname}/out")).unwrap();
             fs::write(format!("src/bin/{fname}.rs"), TEMPLATE).unwrap();
         }
 

@@ -32,8 +32,7 @@ impl SysCommand<Child> for Command {
 
 impl SysChild for Child {
     fn stdin_write(&mut self, buf: &[u8]) -> Result<usize> {
-        let mut child_in = self.stdin.as_ref().unwrap();
-        child_in.write(buf)
+		self.stdin.as_ref().unwrap().write(buf)
     }
 
     fn stdout_read(&mut self, buf: &mut [u8]) -> Result<usize> {
@@ -43,5 +42,50 @@ impl SysChild for Child {
 
     fn kill(&mut self) -> Result<()> {
         self.kill()
+    }
+}
+
+#[cfg(test)]
+pub(crate) mod syscommand_test {
+    use super::{SysChild, SysCommand};
+    use std::io::prelude::*;
+    use std::io::Cursor;
+    use std::io::Result;
+
+    pub(crate) struct DummyCommand {
+        pub(crate) exit_status: u8,
+        pub(crate) out_expect: String,
+    }
+
+    pub(crate) struct DummyChild {
+        pub(crate) stdin: Vec<u8>,
+        pub(crate) stdout: Box<dyn Read>,
+    }
+
+    impl SysCommand<DummyChild> for DummyCommand {
+        fn status(&mut self) -> Result<u8> {
+            Ok(self.exit_status)
+        }
+
+        fn spawn(&mut self) -> Result<DummyChild> {
+            Ok(DummyChild {
+                stdin: Vec::new(),
+                stdout: Box::new(Cursor::new(self.out_expect.clone())),
+            })
+        }
+    }
+
+    impl SysChild for DummyChild {
+        fn stdin_write(&mut self, buf: &[u8]) -> Result<usize> {
+            self.stdin.write(buf)
+        }
+
+        fn stdout_read(&mut self, buf: &mut [u8]) -> Result<usize> {
+            self.stdout.read(buf)
+        }
+
+        fn kill(&mut self) -> Result<()> {
+            Ok(())
+        }
     }
 }

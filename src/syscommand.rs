@@ -11,6 +11,8 @@ pub trait SysCommand<C: SysChild> {
 pub trait SysChild {
     fn stdin_write(&mut self, buf: &[u8]) -> Result<usize>;
     fn stdout_read(&mut self, buf: &mut [u8]) -> Result<usize>;
+
+	fn stdout(self) -> Option<Box<dyn Read>>;
     fn kill(&mut self) -> Result<()>;
 }
 
@@ -39,6 +41,14 @@ impl SysChild for Child {
         let child_out = self.stdout.as_mut().unwrap();
         child_out.read(buf)
     }
+
+	fn stdout(self) -> Option<Box<dyn Read>> {
+		if let Some(stdout) = self.stdout {
+			Some(Box::new(stdout))
+		} else {
+			None
+		}
+	}
 
     fn kill(&mut self) -> Result<()> {
         self.kill()
@@ -83,6 +93,10 @@ pub(crate) mod syscommand_test {
         fn stdout_read(&mut self, buf: &mut [u8]) -> Result<usize> {
             self.stdout.read(buf)
         }
+
+		fn stdout(self) -> Option<Box<dyn Read>> {
+			Some(self.stdout)
+		}
 
         fn kill(&mut self) -> Result<()> {
             Ok(())

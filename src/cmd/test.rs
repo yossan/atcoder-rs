@@ -40,7 +40,6 @@ impl Run for Test {
                     println!("OK: {:?}", in_file_name);
                 }
                 Err(e) => {
-                    println!("NG: {:?}, reason = {e}", in_file_name);
                 }
             }
         }
@@ -48,16 +47,23 @@ impl Run for Test {
     }
 }
 
-#[derive(Debug)]
-struct WrongAnswer;
+struct WrongAnswer<R> where R: Read {
+	output: R,
+}
 
-impl std::fmt::Display for WrongAnswer {
+impl<R: Read> std::fmt::Display for WrongAnswer<R> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "WrongAnswer")
     }
 }
 
-impl Error for WrongAnswer {}
+impl<R: Read> std::fmt::Debug for WrongAnswer<R> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "WrongAnswer")
+	}
+}
+
+impl<R: Read> Error for WrongAnswer<R> {}
 
 fn cargo_run<P, C>(
     mut cargo_cmd: P,
@@ -89,7 +95,9 @@ where
         let expect_bytes_read = out_file.read(&mut expect_buf)?;
         if stdout_bytes_read != expect_bytes_read || stdout_buf[..stdout_bytes_read] != expect_buf[..expect_bytes_read] {
             let _ = cargo.kill();
-            return Err(Box::new(WrongAnswer));
+            return Err(Box::new(WrongAnswer{
+				output: cargo.stdout().unwrap(),
+			}));
         }
 
         if stdout_bytes_read == 0 {

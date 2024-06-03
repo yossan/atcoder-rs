@@ -1,6 +1,7 @@
 mod new;
 mod test;
 
+use new::New;
 use clap::Parser;
 use std::error::Error;
 
@@ -28,16 +29,6 @@ impl Cmd {
     }
 }
 
-///  Creates new cargo project
-#[derive(Parser, Debug)]
-pub struct New {
-    /// project name
-    #[arg(value_name = "TEXT")]
-    pub name: String,
-    /// files
-    #[arg(value_name = "TEXT", default_values = ["a", "b", "c", "d"])]
-    pub files: Vec<String>,
-}
 
 #[derive(Parser, Debug)]
 pub struct Test {

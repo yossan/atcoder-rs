@@ -1,9 +1,10 @@
 mod new;
-mod test;
+mod testcase;
 
-use new::New;
 use clap::Parser;
+use new::New;
 use std::error::Error;
+use testcase::Testcase;
 
 pub trait Run {
     fn run(&self) -> Result<(), Box<dyn Error>>;
@@ -14,7 +15,7 @@ pub trait Run {
 #[command(propagate_version = true)]
 pub enum Cmd {
     New(New),
-    Test(Test),
+    Testcase(Testcase),
 }
 
 impl Cmd {
@@ -24,13 +25,7 @@ impl Cmd {
     pub fn run(&self) -> Result<(), Box<dyn Error>> {
         match self {
             Cmd::New(cmd) => cmd.run(),
-            Cmd::Test(cmd) => cmd.run(),
+            Cmd::Testcase(cmd) => cmd.run(),
         }
     }
-}
-
-
-#[derive(Parser, Debug)]
-pub struct Test {
-    src_name: String,
 }

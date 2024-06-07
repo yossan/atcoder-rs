@@ -39,8 +39,8 @@ impl Run for New {
         // Create bin folder
         fs::create_dir("src/bin")?;
 
-		// Create source files
-		for fname in files {
+        // Create source files
+        for fname in files {
             fs::File::create(format!("src/bin/{fname}.rs")).unwrap();
             fs::write(format!("src/bin/{fname}.rs"), TEMPLATE).unwrap();
         }

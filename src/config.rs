@@ -8,4 +8,3 @@ fn main() {
 ";
 
 pub const TESTCASE_DIR_NAME: &str = "testcase";
-

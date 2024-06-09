@@ -46,3 +46,7 @@ If the source file name and the parent directory containing the test cases have 
 ```
 $ atcoder testcase A2 -d A
 ```
+
+# License 
+
+This is licensed under MIT.

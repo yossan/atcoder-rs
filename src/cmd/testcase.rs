@@ -96,7 +96,10 @@ impl Run for Testcase {
         for in_entry in testcase_in.read_dir()? {
             let Ok(in_entry) = in_entry else { continue };
             let in_path = &in_entry.path();
-            let Some(in_file_name_with_ext) = in_path.file_name().and_then(std::ffi::OsStr::to_str) else { continue; };
+            let Some(in_file_name_with_ext) = in_path.file_name().and_then(std::ffi::OsStr::to_str)
+            else {
+                continue;
+            };
             if in_path.extension().and_then(std::ffi::OsStr::to_str) != Some("txt") {
                 continue;
             }

@@ -2,6 +2,7 @@
 name = "atcoder-rs"
 version = "0.1.0"
 edition = "2021"
+description = "Tool to create cargo project for AtCoder and run testcase"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -1,10 +1,6 @@
-use std::fmt::Debug;
 use std::io::prelude::*;
 use std::io::{Error, ErrorKind, Result};
-use std::process::{Child, ChildStdout, Command};
-
-pub trait ReadDebug: Read + Debug {}
-impl ReadDebug for ChildStdout {}
+use std::process::{Child, Command};
 
 pub trait SysCommand<C: SysChild> {
     fn status(&mut self) -> Result<i32>;
@@ -32,8 +28,6 @@ pub trait SysChild {
         }
         Ok(sum)
     }
-
-    fn stdout(self) -> Option<Box<dyn ReadDebug>>;
 
     fn exit_code(&mut self) -> Result<i32>;
 
@@ -72,14 +66,6 @@ impl SysChild for Child {
         child_out.read(buf)
     }
 
-    fn stdout(self) -> Option<Box<dyn ReadDebug>> {
-        if let Some(stdout) = self.stdout {
-            Some(Box::new(stdout))
-        } else {
-            None
-        }
-    }
-
     fn exit_code(&mut self) -> Result<i32> {
         match self.wait() {
             Ok(exit_code) => match exit_code.code() {
@@ -100,11 +86,13 @@ impl SysChild for Child {
 
 #[cfg(test)]
 pub(crate) mod syscommand_test {
-    use super::{ReadDebug, SysChild, SysCommand};
+    use super::{SysChild, SysCommand};
     use std::fmt::{self, Debug, Formatter};
     use std::io::prelude::*;
     use std::io::Cursor;
     use std::io::Result;
+
+    pub trait ReadDebug: Read + Debug {}
 
     impl ReadDebug for Cursor<String> {}
 
@@ -149,10 +137,6 @@ pub(crate) mod syscommand_test {
 
         fn stdout_read(&mut self, buf: &mut [u8]) -> Result<usize> {
             self.stdout.read(buf)
-        }
-
-        fn stdout(self) -> Option<Box<dyn ReadDebug>> {
-            Some(self.stdout)
         }
 
         fn exit_code(&mut self) -> Result<i32> {
